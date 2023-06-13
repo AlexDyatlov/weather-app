@@ -1,7 +1,10 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {}
+    extend: {},
+    fontFamily: {
+      ms: ['Montserrat', 'Arial', 'Helvetica', 'sans-serif']
+    }
   },
   plugins: []
 };
