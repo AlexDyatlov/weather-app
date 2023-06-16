@@ -1,4 +1,4 @@
-type TitleTag = 'h1' | 'h2' | 'h3' | 'div';
+type TitleTag = 'h1' | 'h2' | 'h3' | 'div' | 'p';
 
 interface TitleProps {
   className: string;
