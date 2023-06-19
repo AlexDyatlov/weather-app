@@ -13,6 +13,7 @@ import AccordionItem from './components/common/accordionItem/accordionItem';
 import Container from './components/common/container/container';
 import Title from './components/common/title/title';
 import TextField from './components/common/textField/textField';
+import Description from './components/ui/description/description';
 
 interface IWeather {
   description: string;
@@ -64,7 +65,7 @@ interface ICity {
 }
 
 function App() {
-  const [getCoordinates, setGetCoordinates] = useState<{lat: number, long: number }>();
+  const [getCoordinates, setGetCoordinates] = useState<{ lat: number; long: number }>();
   const [city, setCity] = useState({
     city: ''
   });
@@ -72,14 +73,19 @@ function App() {
   const [dataWeek, setdataWeek] = useState<IWeekData>();
   const [location, setLocation] = useState<ICity[]>();
   const { coordinates, error } = useGeoLocation();
-  const weatherParamsCommon = `&units=metric&lang=ru&exclude=alerts,minutely,hourly&appid=${import.meta.env.VITE_API_KEY}`;
+  const weatherParamsCommon = `&units=metric&lang=ru&exclude=alerts,minutely,hourly&appid=${
+    import.meta.env.VITE_API_KEY
+  }`;
   const coordinatesParams = `?q=${city.city}&limit=5&appid=${import.meta.env.VITE_API_KEY}`;
   const weatherParams = getCoordinates
     ? `?lat=${getCoordinates.lat}&lon=${getCoordinates.long}${weatherParamsCommon}`
     : `?lat=${coordinates.lat}&lon=${coordinates.long}${weatherParamsCommon}`;
 
   const [accordion, setAccordion] = useState(0);
+  const [showPopUp, setShowPopUp] = useState(false);
   const controllerRef = useRef<AbortController | null>();
+  const popUpRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const searchCity = useDebounce(city.city, 500);
   const controller = new AbortController();
@@ -92,8 +98,9 @@ function App() {
     controllerRef.current = null;
   };
 
-  const handleGetPositionCity = (target: {lat: number, long: number }) => {
+  const handleGetPositionCity = (target: { lat: number; long: number }) => {
     setGetCoordinates(target);
+    setShowPopUp(false);
   };
 
   const handleToggleAccordion = (index: number) => {
@@ -109,6 +116,7 @@ function App() {
       ...prevState,
       [target.name]: target.value
     }));
+    setShowPopUp(true);
   };
 
   const cancelSearch = () => {
@@ -133,6 +141,24 @@ function App() {
     return cancelSearch();
   }, [searchCity]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        popUpRef.current &&
+        inputRef.current &&
+        !popUpRef.current.contains(e.target as Node) &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowPopUp(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showPopUp]);
+
   if (error) {
     return <div>{error}</div>;
   }
@@ -146,24 +172,37 @@ function App() {
     <div className="">
       <header>
         <Container>
+          <Title className="mb-7 text-3xl font-medium" tag="h1">
+            Приложение Погода — онлайн-прогноз
+          </Title>
+          <Description />
           <div className="relative mb-8 max-w-xl">
             <TextField
               label="Введите название города"
               name="city"
               value={city.city}
               onChange={handleChange}
+              onFocus={() => setShowPopUp(true)}
               placeholder="Город"
+              ref={inputRef}
             />
             {location && (
-              <div className="overflow-hidden absolute left-0 mt-2 w-full rounded-[5px] border border-[#C2C2C2] bg-white ring-0">
+              <div
+                className={
+                  'absolute left-0 mt-2 w-full overflow-hidden rounded-[5px] border border-[#C2C2C2] bg-white/95 ring-0 transition-[visibility,opacity] duration-200 ease-in-out ' +
+                  (!showPopUp ? 'invisible opacity-0' : 'visible opacity-100')
+                }
+                ref={popUpRef}
+              >
                 {location.length > 0 ? (
                   <ul className="w-full">
                     {location.map((item, index) => (
                       <li key={index}>
                         <button
-                          className="flex w-full items-center gap-2 px-[18px] py-2 hover:bg-slate-200 transition-colors duration-300 ease-in-out"
+                          className="flex w-full items-center gap-2 px-[18px] py-2 transition-colors duration-300 ease-in-out hover:bg-slate-200"
                           type="button"
-                          onClick={() => handleGetPositionCity({ lat: item.lat, long: item.lon })}>
+                          onClick={() => handleGetPositionCity({ lat: item.lat, long: item.lon })}
+                        >
                           {item.name}, {item.country}
                           <img
                             src={`https://openweathermap.org/images/flags/${item.country.toLowerCase()}.png`}
@@ -174,7 +213,7 @@ function App() {
                     ))}
                   </ul>
                 ) : (
-                  <Title className="text-2xl font-medium text-red-500 px-[18px] py-4" tag="p">
+                  <Title className="px-[18px] py-4 text-2xl font-medium text-red-500" tag="p">
                     Город не найден!
                   </Title>
                 )}
@@ -183,8 +222,8 @@ function App() {
           </div>
           {data && dataWeather && (
             <>
-              <Title className="mb-7 text-3xl font-medium" tag="h1">
-                Погода в {data.name}, {data.sys.country}{' '}
+              <Title className="mb-7 text-3xl font-medium" tag="div">
+                {data.name}, {data.sys.country}{' '}
                 <span className="inline-block text-base font-normal">
                   {displayFullDate(data.dt)}
                 </span>
@@ -228,7 +267,7 @@ function App() {
 
             {dataWeek && (
               <>
-                <ul className="border-t border-t-[#b2b2b2]">
+                <ul className="border-t border-t-black">
                   {dataWeek.daily.map((item, index) => (
                     <AccordionItem
                       item={item}

@@ -10,14 +10,14 @@ interface AccordionItemProps {
 
 const AccordionItem: React.FC<AccordionItemProps> = ({ item, children, visible, onToggle }) => {
   return (
-    <li className="border-b border-b-[#b2b2b2]">
+    <li className="border-b border-b-black">
       <button
-        className="flex w-full items-center py-2 gap-2"
+        className="flex w-full items-center gap-2 py-2"
         type="button"
         aria-expanded={visible}
         onClick={onToggle}
       >
-        {displayDate(item.dt)}
+        <span className='inline-block font-medium'>{displayDate(item.dt)}</span>
         <div>
           <img
             src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
