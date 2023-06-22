@@ -31,6 +31,7 @@ function App() {
   const { coordinates, error } = useGeoLocation({ selectedCoordinates: getCoordinates });
   const [accordion, setAccordion] = useState(0);
   const [showPopUp, setShowPopUp] = useState(false);
+  const [spinner, setSpinner] = useState(false);
   const controllerRef = useRef<AbortController | null>();
   const popUpRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,8 +46,11 @@ function App() {
   controllerRef.current = new AbortController();
 
   const handleGetCities = async () => {
+    setSpinner(true);
     const objLocation = await coordinatesService.get(coordinatesParams);
     setLocation(objLocation);
+    setSpinner(false);
+
     controllerRef.current = null;
   };
 
@@ -133,6 +137,7 @@ function App() {
               onFocus={() => setShowPopUp(true)}
               placeholder="Город"
               ref={inputRef}
+              loader={spinner}
             />
             {location && (
               <Dropdown

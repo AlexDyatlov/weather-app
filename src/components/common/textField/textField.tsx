@@ -1,4 +1,7 @@
 import { Ref, forwardRef } from 'react';
+import cs from 'classnames';
+
+import SvgIcon from '../svgIcon/svgIcon';
 
 interface TextFieldProps {
   name: string;
@@ -7,11 +10,12 @@ interface TextFieldProps {
   label: string;
   onChange: (target: { name: string; value: string }) => void;
   onFocus: () => void;
+  loader?: boolean;
 }
 
 const TextField = forwardRef(
   (
-    { name, label, placeholder, value, onChange, onFocus }: TextFieldProps,
+    { name, label, placeholder, value, loader, onChange, onFocus }: TextFieldProps,
     ref: Ref<HTMLInputElement>
   ) => {
     const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +23,7 @@ const TextField = forwardRef(
     };
 
     return (
-      <div>
+      <div className="relative">
         <label className="mb-1 block text-lg text-[#505050]" htmlFor={name}>
           {label}
         </label>
@@ -38,6 +42,13 @@ const TextField = forwardRef(
           onFocus={onFocus}
           ref={ref}
         />
+        {loader && (
+          <SvgIcon
+            className="absolute bottom-2.5 right-[15px] animate-spin text-black"
+            name="loader"
+            size="20"
+          />
+        )}
       </div>
     );
   }
