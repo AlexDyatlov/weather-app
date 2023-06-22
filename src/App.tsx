@@ -7,90 +7,42 @@ import weatherForWeekService from './services/weatherForWeek.service';
 import useGeoLocation from './hooks/useGeoLocation';
 import useDebounce from './hooks/useDebounce';
 
-import { displayFullDate } from './utils/displayDate';
+import { ICity } from './@types/city.interface';
+import { IWeekWeather } from './@types/weekWeather.interface';
+import { ICurrentWeather } from './@types/currentWeather.interface';
 
 import AccordionItem from './components/common/accordionItem/accordionItem';
 import Container from './components/common/container/container';
 import Title from './components/common/title/title';
 import TextField from './components/common/textField/textField';
 import Description from './components/ui/description/description';
-
-interface IWeather {
-  description: string;
-  icon: string;
-}
-
-interface ITemperature {
-  humidity: number;
-  temp: number;
-}
-
-interface ICurrentTemperature {
-  min: number;
-  max: number;
-  day: number;
-  morn: number;
-  night: number;
-  eve: number;
-}
-
-interface IData {
-  dt: string;
-  name: string;
-  sys: { country: string };
-  weather: IWeather[];
-  clouds: { all: number };
-  main: ITemperature;
-}
-
-export interface IWeatherWeek {
-  clouds: number;
-  humidity: number;
-  dt: string;
-  temp: ICurrentTemperature;
-  feels_like: ICurrentTemperature;
-  weather: IWeather[];
-  wind_speed: number;
-}
-
-interface IWeekData {
-  daily: IWeatherWeek[];
-}
-
-interface ICity {
-  country: string;
-  name: string;
-  lat: number;
-  lon: number;
-}
+import FullDescriptionWeather from './components/ui/fullDescriptionWeather/fullDescriptionWeather';
+import CurrentWeather from './components/ui/currentWeather/currentWeather';
+import Dropdown from './components/common/dropdown/dropdown';
 
 function App() {
   const [getCoordinates, setGetCoordinates] = useState<{ lat: number; long: number }>();
   const [city, setCity] = useState({
     city: ''
   });
-  const [data, setData] = useState<IData>();
-  const [dataWeek, setdataWeek] = useState<IWeekData>();
+  const [data, setData] = useState<ICurrentWeather>();
+  const [dataWeek, setDataWeek] = useState<{ daily: IWeekWeather[] }>();
   const [location, setLocation] = useState<ICity[]>();
-  const { coordinates, error } = useGeoLocation();
-  const weatherParamsCommon = `&units=metric&lang=ru&exclude=alerts,minutely,hourly&appid=${
-    import.meta.env.VITE_API_KEY
-  }`;
-  const coordinatesParams = `?q=${city.city}&limit=5&appid=${import.meta.env.VITE_API_KEY}`;
-  const weatherParams = getCoordinates
-    ? `?lat=${getCoordinates.lat}&lon=${getCoordinates.long}${weatherParamsCommon}`
-    : `?lat=${coordinates.lat}&lon=${coordinates.long}${weatherParamsCommon}`;
-
+  const { coordinates, error } = useGeoLocation({ selectedCoordinates: getCoordinates });
   const [accordion, setAccordion] = useState(0);
   const [showPopUp, setShowPopUp] = useState(false);
   const controllerRef = useRef<AbortController | null>();
   const popUpRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const coordinatesParams = `?q=${city.city}&limit=5&appid=${import.meta.env.VITE_API_KEY}`;
+  const weatherParamsCommon = `&units=metric&lang=ru&exclude=alerts,minutely,hourly&appid=${
+    import.meta.env.VITE_API_KEY
+  }`;
+  const weatherParams = `?lat=${coordinates.lat}&lon=${coordinates.long}${weatherParamsCommon}`;
+  const dataWeather = data?.weather[0];
   const searchCity = useDebounce(city.city, 500);
-  const controller = new AbortController();
 
-  controllerRef.current = controller;
+  controllerRef.current = new AbortController();
 
   const handleGetCities = async () => {
     const objLocation = await coordinatesService.get(coordinatesParams);
@@ -119,17 +71,13 @@ function App() {
     setShowPopUp(true);
   };
 
-  const cancelSearch = () => {
-    controllerRef.current?.abort();
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       if (coordinates.lat && coordinates.long) {
         const content = await weatherService.get(weatherParams);
         const contentWeatherWeek = await weatherForWeekService.get(weatherParams);
         setData(content);
-        setdataWeek(contentWeatherWeek);
+        setDataWeek(contentWeatherWeek);
       }
     };
 
@@ -138,7 +86,8 @@ function App() {
 
   useEffect(() => {
     if (searchCity || city.city.trim().length < 0) handleGetCities();
-    return cancelSearch();
+
+    return controllerRef.current?.abort();
   }, [searchCity]);
 
   useEffect(() => {
@@ -167,9 +116,8 @@ function App() {
     return <h1>Загрузка...</h1>;
   }
 
-  const dataWeather = data?.weather[0];
   return (
-    <div className="">
+    <>
       <header>
         <Container>
           <Title className="mb-7 text-3xl font-medium" tag="h1">
@@ -187,74 +135,20 @@ function App() {
               ref={inputRef}
             />
             {location && (
-              <div
-                className={
-                  'absolute left-0 mt-2 w-full overflow-hidden rounded-[5px] border border-[#C2C2C2] bg-white/95 ring-0 transition-[visibility,opacity] duration-200 ease-in-out ' +
-                  (!showPopUp ? 'invisible opacity-0' : 'visible opacity-100')
-                }
+              <Dropdown
+                show={showPopUp}
                 ref={popUpRef}
-              >
-                {location.length > 0 ? (
-                  <ul className="w-full">
-                    {location.map((item, index) => (
-                      <li key={index}>
-                        <button
-                          className="flex w-full items-center gap-2 px-[18px] py-2 transition-colors duration-300 ease-in-out hover:bg-slate-200"
-                          type="button"
-                          onClick={() => handleGetPositionCity({ lat: item.lat, long: item.lon })}
-                        >
-                          {item.name}, {item.country}
-                          <img
-                            src={`https://openweathermap.org/images/flags/${item.country.toLowerCase()}.png`}
-                            alt="Флаг страны"
-                          />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <Title className="px-[18px] py-4 text-2xl font-medium text-red-500" tag="p">
-                    Город не найден!
-                  </Title>
-                )}
-              </div>
+                options={location}
+                onGetPosition={handleGetPositionCity}
+              />
             )}
           </div>
           {data && dataWeather && (
-            <>
-              <Title className="mb-7 text-3xl font-medium" tag="div">
-                {data.name}, {data.sys.country}{' '}
-                <span className="inline-block text-base font-normal">
-                  {displayFullDate(data.dt)}
-                </span>
-              </Title>
-
-              <div className="mb-8 border-l-2 border-l-[#0ea5e9] pl-4">
-                <div className="mb-2 flex items-end">
-                  <p className="text-lg">
-                    Температура воздуха{' '}
-                    <span className="inline-block text-[30px] font-medium leading-none">
-                      {Math.round(data.main.temp)}°C
-                    </span>
-                  </p>
-                  <div className="h-12 w-12">
-                    <img
-                      className="object-cover"
-                      src={`https://openweathermap.org/img/wn/${dataWeather.icon}@2x.png`}
-                      aria-hidden="true"
-                      alt="Иконка погоды"
-                    />
-                  </div>
-                </div>
-                <div className="mb-2 text-lg">
-                  <span className="inline-block font-medium">Влажность</span> {data.main.humidity}%
-                </div>
-                <div className="text-lg">
-                  <span className="inline-block font-medium">Облачность</span> {data.clouds.all}%,{' '}
-                  {dataWeather.description}
-                </div>
-              </div>
-            </>
+            <CurrentWeather
+              icon={dataWeather.icon}
+              description={dataWeather.description}
+              {...data}
+            />
           )}
         </Container>
       </header>
@@ -267,7 +161,7 @@ function App() {
 
             {dataWeek && (
               <>
-                <ul className="border-t border-t-black">
+                <ul className="max-w-[700px] border-t border-t-black">
                   {dataWeek.daily.map((item, index) => (
                     <AccordionItem
                       item={item}
@@ -275,48 +169,7 @@ function App() {
                       key={index}
                       onToggle={() => handleToggleAccordion(index)}
                     >
-                      <p>
-                        Облачность {item.clouds}%, {item.weather[0].description}{' '}
-                      </p>
-                      <p>Влажность {item.humidity} %</p>
-                      <p>Скорость ветра {item.wind_speed.toFixed(1)} метр/сек</p>
-                      <div className="pb-4">
-                        <ul className="flex gap-3 border-b border-b-slate-400 pb-2 text-center">
-                          <li className="w-full max-w-[180px]"></li>
-                          <li className="w-full max-w-[80px]">Утро</li>
-                          <li className="w-full max-w-[80px]">День</li>
-                          <li className="w-full max-w-[80px]">Вечер</li>
-                          <li className="w-full max-w-[80px]">Ночь</li>
-                        </ul>
-                        <ul>
-                          <li className="flex gap-3 py-2 text-center">
-                            <div className="w-full max-w-[180px] text-left">Температура:</div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.temp.morn)}°C
-                            </div>
-                            <div className="w-full max-w-[80px]">{Math.round(item.temp.day)}°C</div>
-                            <div className="w-full max-w-[80px]">{Math.round(item.temp.eve)}°C</div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.temp.night)}°C
-                            </div>
-                          </li>
-                          <li className="flex gap-3 text-center">
-                            <div className="w-full max-w-[180px] text-left">Ощущается как:</div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.feels_like.morn)}°C
-                            </div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.feels_like.day)}°C
-                            </div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.feels_like.eve)}°C
-                            </div>
-                            <div className="w-full max-w-[80px]">
-                              {Math.round(item.feels_like.night)}°C
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
+                      <FullDescriptionWeather {...item} />
                     </AccordionItem>
                   ))}
                 </ul>
@@ -325,7 +178,7 @@ function App() {
           </Container>
         </section>
       </main>
-    </div>
+    </>
   );
 }
 

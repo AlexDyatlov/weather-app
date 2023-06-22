@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 
-interface ICoordinates {
+export interface ICoordinates {
   lat: null | number;
   long: null | number;
 }
 
-export default function useGeoLocation() {
-  const [coordinates, setCoordinates] = useState<ICoordinates>({
-    lat: null,
-    long: null
-  });
+interface IUseGeoLocationOptions {
+  selectedCoordinates?: ICoordinates;
+}
+
+export default function useGeoLocation({
+  selectedCoordinates = { lat: null, long: null }
+}: IUseGeoLocationOptions) {
+  const [coordinates, setCoordinates] = useState<ICoordinates>(selectedCoordinates);
   const [error, setError] = useState<string | null>(null);
   const geolocationAPI = navigator.geolocation;
 
@@ -30,6 +33,12 @@ export default function useGeoLocation() {
 
     geolocationAPI.getCurrentPosition(handleSuccess, handleError);
   }, []);
+
+  useEffect(() => {
+    if (selectedCoordinates.lat !== null && selectedCoordinates.long !== null) {
+      setCoordinates(selectedCoordinates);
+    }
+  }, [selectedCoordinates]);
 
   return { coordinates, error };
 }
