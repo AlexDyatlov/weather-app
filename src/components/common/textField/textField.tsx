@@ -1,5 +1,4 @@
 import { Ref, forwardRef } from 'react';
-import cs from 'classnames';
 
 import SvgIcon from '../svgIcon/svgIcon';
 

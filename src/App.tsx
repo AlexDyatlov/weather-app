@@ -19,6 +19,8 @@ import Description from './components/ui/description/description';
 import FullDescriptionWeather from './components/ui/fullDescriptionWeather/fullDescriptionWeather';
 import CurrentWeather from './components/ui/currentWeather/currentWeather';
 import Dropdown from './components/common/dropdown/dropdown';
+import Alert from './components/common/alert/alert';
+import AlertMessage from './components/common/alert/alertMessage';
 
 function App() {
   const [getCoordinates, setGetCoordinates] = useState<{ lat: number; long: number }>();
@@ -27,6 +29,7 @@ function App() {
   });
   const [data, setData] = useState<ICurrentWeather>();
   const [dataWeek, setDataWeek] = useState<{ daily: IWeekWeather[] }>();
+  const [errorData, setErrorData] = useState<string | null>(null);
   const [location, setLocation] = useState<ICity[]>();
   const { coordinates, error } = useGeoLocation({ selectedCoordinates: getCoordinates });
   const [accordion, setAccordion] = useState(0);
@@ -77,11 +80,17 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (coordinates.lat && coordinates.long) {
-        const content = await weatherService.get(weatherParams);
-        const contentWeatherWeek = await weatherForWeekService.get(weatherParams);
-        setData(content);
-        setDataWeek(contentWeatherWeek);
+      try {
+        if (coordinates.lat && coordinates.long) {
+          const content = await weatherService.get(weatherParams);
+          const contentWeatherWeek = await weatherForWeekService.get(weatherParams);
+          setData(content);
+          setDataWeek(contentWeatherWeek);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          setErrorData(error.message);
+        }
       }
     };
 
@@ -113,11 +122,22 @@ function App() {
   }, [showPopUp]);
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <Container>
+        Ошибка: {error}
+        <Alert>
+          <AlertMessage type="error" message={error} />
+        </Alert>
+      </Container>
+    );
   }
 
   if (!coordinates.lat && !coordinates.long) {
-    return <h1>Загрузка...</h1>;
+    return (
+      <Container>
+        <div>Загрузка...</div>
+      </Container>
+    );
   }
 
   return (
@@ -180,6 +200,10 @@ function App() {
                 </ul>
               </>
             )}
+            <Alert>
+              <AlertMessage type="success" message="Геолокация включена" />
+              {errorData && <AlertMessage type="error" message={errorData} />}
+            </Alert>
           </Container>
         </section>
       </main>
