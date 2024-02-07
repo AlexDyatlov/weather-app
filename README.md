@@ -66,5 +66,5 @@
 
 ### <a name="image"></a> 🖼️ Изображение
 <p align="center">
-  <img src="https://github.com/AlexDyatlov/To-Do-List/blob/main/public/interface.png">
+  <img src="https://github.com/AlexDyatlov/weather-app/blob/main/public/interface.png">
 </p>
