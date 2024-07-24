@@ -32,7 +32,7 @@ export default function useGeoLocation({
     }
 
     geolocationAPI.getCurrentPosition(handleSuccess, handleError);
-  }, []);
+  }, [geolocationAPI]);
 
   useEffect(() => {
     if (selectedCoordinates.lat !== null && selectedCoordinates.long !== null) {

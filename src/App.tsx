@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import weatherService from './services/weather.service';
 import coordinatesService from './services/coordinates.service';
@@ -48,14 +48,14 @@ function App() {
 
   controllerRef.current = new AbortController();
 
-  const handleGetCities = async () => {
+  const handleGetCities = useCallback(async () => {
     setSpinner(true);
     const objLocation = await coordinatesService.get(coordinatesParams);
     setLocation(objLocation);
     setSpinner(false);
 
     controllerRef.current = null;
-  };
+  }, [coordinatesParams]);
 
   const handleGetPositionCity = (target: { lat: number; long: number }) => {
     setGetCoordinates(target);
@@ -95,13 +95,13 @@ function App() {
     };
 
     fetchData();
-  }, [coordinates, getCoordinates]);
+  }, [coordinates, getCoordinates, weatherParams]);
 
   useEffect(() => {
     if (searchCity || city.city.trim().length < 0) handleGetCities();
 
     return controllerRef.current?.abort();
-  }, [searchCity]);
+  }, [searchCity, city.city, handleGetCities]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
