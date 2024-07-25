@@ -15,6 +15,7 @@
     "jsx": "react-jsx",
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
 
     /* Linting */
     "strict": true,
@@ -22,6 +23,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "./jest.setup.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

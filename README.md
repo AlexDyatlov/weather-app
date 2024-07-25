@@ -36,6 +36,7 @@
   + `yarn build` - собирает файлы проекта в один каталог.
   + `yarn lint` - запускает ESLint для проверки ts,tsx файлов.
   + `yarn format` - запускает Prettier для форматирования ts,tsx файлов.
+  + `yarn test` - запускает Jest для тестирования JavaScript.
 
 ### <a name="docker"></a> 🐳 Развертывание проекта в Docker:
 
@@ -46,6 +47,7 @@
   + `docker compose up`
 3. `docker compose run --rm node yarn lint` — Запуск ESLint.
 4. `docker compose run --rm node yarn format` — Запуск Prettier.
+5. `docker compose run --rm node yarn test` — Запуск Jest.
 
 ### <a name="result"></a> 🎉 Результат:
   + Стилистика ✅

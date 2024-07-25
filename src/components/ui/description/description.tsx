@@ -5,7 +5,7 @@ const Description = () => {
 
   return (
     <div className="mb-10 max-w-[700px]">
-      <div className="grid gap-3 text-sm font-normal">
+      <div className="grid gap-3 text-sm font-normal" data-testid="test-text-initial">
         <p>
           Приложение строит прогноз с&nbsp;точностью до&nbsp;дома и&nbsp;показывает осадки
           в&nbsp;реальном времени.
@@ -27,12 +27,13 @@ const Description = () => {
         <button
           className="font-xs ml-auto block font-normal text-[#0ea5e9]"
           type="button"
+          data-testid="test-btn-showmore"
           onClick={() => setShowMore(!showMore)}
         >
           еще
         </button>
       ) : (
-        <div className="mt-5 text-sm font-normal">
+        <div className="mt-5 text-sm font-normal" data-testid="test-text-showmore">
           <p>
             — Определение местоположения пользователя и&nbsp;отображение актуальной погоды
             в&nbsp;этом районе.
