@@ -46,7 +46,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ item, children, visible, 
             '!visible h-[auto] opacity-100': visible
           }
         )}
-        aria-hidden={visible}
+        aria-hidden={!visible}
       >
         {children}
       </div>

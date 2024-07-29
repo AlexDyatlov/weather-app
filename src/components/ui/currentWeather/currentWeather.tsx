@@ -2,9 +2,9 @@ import Title from '../../common/title/title';
 
 import { displayFullDate } from '../../../utils/displayDate';
 
-import { ICurrentWeather, IWeather } from '../../../@types/currentWeather.interface';
+import { ICurrentWeather } from '../../../@types/currentWeather.interface';
 
-const CurrentWeather = ({ icon, description, ...rest }: IWeather) => {
+const CurrentWeather = ({ ...rest }: ICurrentWeather) => {
   const data = rest as unknown as ICurrentWeather;
 
   return (
@@ -25,7 +25,7 @@ const CurrentWeather = ({ icon, description, ...rest }: IWeather) => {
           <div className="h-12 w-12">
             <img
               className="object-cover"
-              src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
+              src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`}
               aria-hidden="true"
               alt="Иконка погоды"
             />
@@ -36,7 +36,7 @@ const CurrentWeather = ({ icon, description, ...rest }: IWeather) => {
         </div>
         <div className="text-lg">
           <span className="inline-block font-medium">Облачность</span> {data.clouds.all}%,{' '}
-          {description}
+          {data.weather[0].description}
         </div>
       </div>
     </>

@@ -43,7 +43,6 @@ function App() {
     import.meta.env.VITE_API_KEY
   }`;
   const weatherParams = `?lat=${coordinates.lat}&lon=${coordinates.long}${weatherParamsCommon}`;
-  const dataWeather = data?.weather[0];
   const searchCity = useDebounce(city.city, 500);
 
   controllerRef.current = new AbortController();
@@ -168,13 +167,7 @@ function App() {
               />
             )}
           </div>
-          {data && dataWeather && (
-            <CurrentWeather
-              icon={dataWeather.icon}
-              description={dataWeather.description}
-              {...data}
-            />
-          )}
+          {data && <CurrentWeather {...data} />}
         </Container>
       </header>
       <main>
