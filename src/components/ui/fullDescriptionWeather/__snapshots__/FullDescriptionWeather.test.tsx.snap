@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FullDescriptionWeather component render 1`] = `
+<div>
+  <p>
+    Облачность 
+    58
+    %, 
+    облачно с прояснениями
+     
+  </p>
+  <p>
+    Влажность 
+    79
+     %
+  </p>
+  <p>
+    Скорость ветра 
+    2.7
+     метр/сек
+  </p>
+  <div
+    class="pb-4"
+  >
+    <ul
+      class="flex gap-3 border-b border-b-slate-400 pb-2 text-center"
+    >
+      <li
+        class="w-full max-w-[180px]"
+      />
+      <li
+        class="w-full max-w-[80px]"
+      >
+        Утро
+      </li>
+      <li
+        class="w-full max-w-[80px]"
+      >
+        День
+      </li>
+      <li
+        class="w-full max-w-[80px]"
+      >
+        Вечер
+      </li>
+      <li
+        class="w-full max-w-[80px]"
+      >
+        Ночь
+      </li>
+    </ul>
+    <ul>
+      <li
+        class="flex gap-3 py-2 text-center"
+      >
+        <div
+          class="w-full max-w-[180px] text-left"
+        >
+          Температура:
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          14
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          16
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          21
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          15
+          °C
+        </div>
+      </li>
+      <li
+        class="flex gap-3 text-center"
+      >
+        <div
+          class="w-full max-w-[180px] text-left"
+        >
+          Ощущается как:
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          14
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          16
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          21
+          °C
+        </div>
+        <div
+          class="w-full max-w-[80px]"
+        >
+          15
+          °C
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+`;
