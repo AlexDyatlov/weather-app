@@ -1,5 +1,14 @@
+function isValidTimestamp(timestamp: string) {
+  const date = new Date(+timestamp);
+  return !isNaN(date.getTime());
+}
+
 export function displayFullDate(timestamp: string) {
-  const date = new Date(+timestamp * 1000);
+  if (!isValidTimestamp(timestamp)) {
+    return 'Некорректный timestamp';
+  }
+
+  const date = new Date(+timestamp);
   const options: Intl.DateTimeFormatOptions = {
     month: 'long',
     day: 'numeric',
@@ -12,7 +21,11 @@ export function displayFullDate(timestamp: string) {
 }
 
 export function displayDate(timestamp: string) {
-  const date = new Date(+timestamp * 1000);
+  if (!isValidTimestamp(timestamp)) {
+    return 'Некорректный timestamp';
+  }
+
+  const date = new Date(+timestamp);
   const options: Intl.DateTimeFormatOptions = {
     month: 'long',
     day: 'numeric',
