@@ -4,9 +4,9 @@ interface SvgIconProps {
   className?: string;
 }
 
-const SvgIcon: React.FC<SvgIconProps> = ({ name, size, className }) => {
+const SvgIcon: React.FC<SvgIconProps> = ({ name, size, className, ...props }) => {
   return (
-    <svg className={`shrink-0 fill-current ${className}`} width={size} height={size}>
+    <svg className={`shrink-0 fill-current ${className}`} width={size} height={size} {...props}>
       <use xlinkHref={`/sprite.svg#${name}`} />
     </svg>
   );

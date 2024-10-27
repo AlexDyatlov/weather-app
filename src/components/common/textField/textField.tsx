@@ -46,6 +46,7 @@ const TextField = forwardRef(
             className="absolute bottom-2.5 right-[15px] animate-spin text-black"
             name="loader"
             size="20"
+            data-testid="icon-loader"
           />
         )}
       </div>
